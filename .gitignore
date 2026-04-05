@@ -185,3 +185,7 @@ meshes/
 
 ompl-1.5.2
 1.5.2.tar.gz
+
+
+*.png
+*.npy

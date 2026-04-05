@@ -4,23 +4,24 @@ from typing import Tuple
 
 import meshcat
 import numpy as np
-import robomimic.utils.file_utils as FileUtils
-import robomimic.utils.torch_utils as TorchUtils
 import torch
 import torch._dynamo
 import urchin
-from robofin.pointcloud.torch import FrankaSampler
-from robofin.robots import FrankaRobot
 
-from neural_mp.envs.franka_real_env import FrankaRealEnv
+import robomimic.utils.file_utils as FileUtils
+import robomimic.utils.torch_utils as TorchUtils
+
+# from neural_mp.envs.franka_real_env import FrankaRealEnv
 from neural_mp.real_utils.homography_utils import save_pointcloud
 from neural_mp.real_utils.model import NeuralMPModel
+from robofin.pointcloud.torch import FrankaSampler
+from robofin.robots import FrankaRobot
 
 
 class NeuralMP:
     def __init__(
         self,
-        env: FrankaRealEnv,
+        env,
         model_url,
         train_mode,
         in_hand,
