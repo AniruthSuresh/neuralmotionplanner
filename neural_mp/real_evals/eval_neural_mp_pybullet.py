@@ -3,13 +3,22 @@ eval_neural_mp_pybullet.py
 ===========================
 Runs the REAL NeuralMP checkpoint (mihdalal/NeuralMP) in a PyBullet
 Franka Panda simulation.  No real robot / Manimo / cameras needed.
+
+─── RUN ───
+ 
+  python neural_mp/real_evals/eval_neural_mp_pybullet.py
+  python neural_mp/real_evals/eval_neural_mp_pybullet.py --tto
+  python neural_mp/real_evals/eval_neural_mp_pybullet.py --scene 1 --tto
+  python neural_mp/real_evals/eval_neural_mp_pybullet.py --no-gui --runs 5
+
+
 """
 import argparse
 import builtins
 import os
 import sys
 
-import matplotlib.pyplot as plt  # <-- ADDED for saving the plot
+import matplotlib.pyplot as plt
 import numpy as np
 import pybullet as p
 
@@ -159,10 +168,16 @@ def main():
 
     print("[Adjust] Modifying start/goal configs to flank obstacles above table...")
     table_z = 0.625
-    target_z = table_z + 0.20
 
+    # BASIC WORKING SETUP
+    target_z = table_z + 0.20
     target_start_pos = [0.50, -0.45, target_z]
     target_goal_pos = [0.30, -0.10, target_z]
+
+    # Flanking left-to-right  => failure
+    # target_z = table_z + 0.1
+    # target_start_pos = [0.50, -0.40, target_z]
+    # target_goal_pos  = [0.50, 0.40, target_z]
 
     start_config, start_pos = get_ik_for_target_pos(start_config, target_start_pos)
     goal_config, goal_pos = get_ik_for_target_pos(goal_config, target_goal_pos)
