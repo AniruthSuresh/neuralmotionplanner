@@ -170,12 +170,12 @@ def main():
     table_z = 0.625
 
     # BASIC WORKING SETUP => success
-    target_z = table_z + 0.20
-    target_start_pos = [0.50, -0.45, target_z]
-    target_goal_pos = [0.30, -0.10, target_z]
+    # target_z = table_z + 0.20
+    # target_start_pos = [0.50, -0.45, target_z]
+    # target_goal_pos = [0.30, -0.10, target_z]
 
     # Flanking front-to-back => success
-    target_z = table_z + 0.35
+    target_z = table_z + 0.1
     target_start_pos = [0.30, 0.0, target_z]
     target_goal_pos = [0.7, 0.0, target_z]
 
