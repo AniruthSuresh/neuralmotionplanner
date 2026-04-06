@@ -169,28 +169,36 @@ def main():
     print("[Adjust] Modifying start/goal configs to flank obstacles above table...")
     table_z = 0.625
 
-    # BASIC WORKING SETUP
+    # BASIC WORKING SETUP => success
     target_z = table_z + 0.20
     target_start_pos = [0.50, -0.45, target_z]
     target_goal_pos = [0.30, -0.10, target_z]
 
-    # Flanking left-to-right  => failure
-    # target_z = table_z + 0.1
-    # target_start_pos = [0.50, -0.40, target_z]
-    # target_goal_pos  = [0.50, 0.40, target_z]
+    # Flanking front-to-back => success
+    target_z = table_z + 0.35
+    target_start_pos = [0.30, 0.0, target_z]
+    target_goal_pos = [0.7, 0.0, target_z]
 
     start_config, start_pos = get_ik_for_target_pos(start_config, target_start_pos)
     goal_config, goal_pos = get_ik_for_target_pos(goal_config, target_goal_pos)
 
+    print(f"\n[Targeting] Calculated Joint Configs:")
+    print(f"  Expected Start: {np.round(start_config, 4)}")
+    print(f"  Expected Goal : {np.round(goal_config, 4)}")
+
+    print("\n[Action] Moving to start config...")
     env.move_robot_to_joint_state(start_config, time_to_go=0.0)
 
-    # =========================================================================
-    # 4. Capture simulated point cloud
-    # =========================================================================
-    print("[PCD] Capturing scene point cloud from virtual cameras...")
-    points, colors = neural_mp.get_scene_pcd()
-    print(f"      → {len(points):,} obstacle points captured.\n")
+    # NEW: Verify the reach before planning
+    actual_start_joints = env.get_joint_angles()
+    start_reach_err = np.linalg.norm(actual_start_joints - start_config)
 
+    print(f"[Verify] Reached Start Position.")
+    print(f"  Actual Joints: {np.round(actual_start_joints, 4)}")
+    print(f"  Reach Error  : {start_reach_err:.6f} rad")
+
+    if start_reach_err > 0.05:
+        print("  [WARN] Large reach error! Robot might be colliding with the table.")
     # =========================================================================
     # 4. Capture simulated point cloud
     # =========================================================================

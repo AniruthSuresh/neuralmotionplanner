@@ -38,6 +38,7 @@ FRANKA_HOME = np.array([0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785])
 ARM_JOINTS = list(range(7))
 CTRL_HZ = 60
 
+
 # Franka sphere approximation for collision checking: (link_idx, local_xyz, radius)
 FRANKA_SPHERES = [
     (0, [0.0, 0.0, 0.05], 0.08),
@@ -182,7 +183,8 @@ class PybulletFrankaEnv:
         return self._gripper_width
 
     def reset(self):
-        self.move_robot_to_joint_state(self.canonical_joint_pose, time_to_go=2.0)
+        # self.move_robot_to_joint_state(self.canonical_joint_pose, time_to_go=2.0)
+        self._set_joints_instant(self.canonical_joint_pose)
 
     def step(
         self, joint_action: Optional[np.ndarray] = None, gripper_action: Optional[float] = None
@@ -195,7 +197,7 @@ class PybulletFrankaEnv:
                     i,
                     p.POSITION_CONTROL,
                     targetPosition=a,
-                    force=250,
+                    force=1000,
                     maxVelocity=2.0,
                     physicsClientId=self._client,
                 )
@@ -213,6 +215,44 @@ class PybulletFrankaEnv:
             self.step(joint_action=start + alpha * (target - start))
             if self.gui:
                 time.sleep(1.0 / self.ctrl_hz)
+
+    # def move_robot_to_joint_state(self,
+    #                               joint_state: np.ndarray,
+    #                               time_to_go:  float = 4.0):
+    #     """
+    #     If time_to_go is 0, teleport the robot instantly.
+    #     Otherwise, move smoothly using the physics engine.
+    #     """
+    #     target = np.clip(joint_state, FRANKA_LOWER, FRANKA_UPPER)
+
+    #     if time_to_go <= 0:
+    #         # 1. Reset the 7 ARM joints
+    #         for i, a in enumerate(target):
+    #             p.resetJointState(self._robot, i, a, physicsClientId=self._client)
+
+    #         # 2. Reset the 2 GRIPPER joints (usually indices 9 and 10)
+    #         # We use self._gripper_width / 2 for each finger
+    #         finger_pos = self._gripper_width / 2.0
+    #         p.resetJointState(self._robot, 9, finger_pos, physicsClientId=self._client)
+    #         p.resetJointState(self._robot, 10, finger_pos, physicsClientId=self._client)
+
+    #         # 3. Force the motor controllers to stay at these positions
+    #         # This prevents the 'snapping' or 'twisting' effect on the next frame
+    #         for i, a in enumerate(target):
+    #             p.setJointMotorControl2(self._robot, i, p.POSITION_CONTROL, targetPosition=a)
+    #         p.setJointMotorControl2(self._robot, 9, p.POSITION_CONTROL, targetPosition=finger_pos)
+    #         p.setJointMotorControl2(self._robot, 10, p.POSITION_CONTROL, targetPosition=finger_pos)
+
+    #         p.stepSimulation(physicsClientId=self._client)
+    #     else:
+    #         # SMOOTH PHYSICS MOVE
+    #         start = self.get_joint_angles()
+    #         n_steps = max(10, int(time_to_go * self.ctrl_hz))
+    #         for i in range(n_steps):
+    #             alpha = (i + 1) / n_steps
+    #             self.step(joint_action=start + alpha * (target - start))
+    #             if self.gui:
+    #                 time.sleep(1.0 / self.ctrl_hz)
 
     def get_scene_pcd(
         self,

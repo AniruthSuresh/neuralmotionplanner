@@ -84,7 +84,7 @@ class NeuralMP:
         use_cache=False,
         cache_name=None,
         debug_raw_pcd=False,
-        debug_combined_pcd=False,
+        debug_combined_pcd=True,
         save_pcd=False,
         save_file_name="combined",
         filter=True,
